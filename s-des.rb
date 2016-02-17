@@ -14,25 +14,46 @@ metod = ARGV[0]
 def bruteforce
   brutekeys = Array.new
   file = File.new($plain, "r")
+  $plainfile = $plain
   while (line = file.gets)
     line = line.split(",")
     1.upto(1023).each do |n|
-      thiskey= "%08b" % n
+      thiskey= "%010b" % n
 
       $key = thiskey.split("")
 
       $plain = line[0]
       cipher = encryptb
       if(cipher == line[1].split("")[0..7])
-        brutekeys.push($key.join(""))
-        break
+        #brutekeys.push($key.join(""))
+        count = counting
+        if(count == 245)
+          puts "llave final #{$key.join()}"
+          return
+        end
       end
     end
   end
   file.close
+
+  #puts brutekeys
   num_hash = Hash[brutekeys.uniq.map { |num| [num, brutekeys.count(num)] }]
   most_freq = brutekeys.sort_by { |num| num_hash[num] }.last
   puts " LLave final: #{most_freq}"
+end
+
+def counting
+  file = File.new($plainfile, "r")
+  counter = 0
+  while (line = file.gets)
+    line = line.split(",")
+    $plain = line[0]
+    cipher = encryptb
+    if(cipher == line[1].split("")[0..7])
+      counter += 1
+    end
+  end
+  counter
 end
 
 def encryptb
