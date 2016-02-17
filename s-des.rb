@@ -93,7 +93,7 @@ def encrypt
   plain2 = fk plain2, keydos
   #puts "Despues del fk2: #{plain2}"
   cipher = permutaciones plain2, $ip1
-  puts "Cipheer: #{cipher}"
+  puts "Cipheer: #{cipher.join()}"
   cipher
 end
 
@@ -115,7 +115,7 @@ def decrypt
   cipherSw = permutaciones cipherfk, $cambio
   cipherfk2 = fk cipherSw, keyuno
   plainfinal = permutaciones cipherfk2, $ip1
-  puts "plainfinal: #{plainfinal}"
+  puts "plainfinal: #{plainfinal.join()}"
   plainfinal
 end
 
