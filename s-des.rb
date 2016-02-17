@@ -16,15 +16,13 @@ def bruteforce
   file = File.new($plain, "r")
   while (line = file.gets)
     line = line.split(",")
-    #puts "#{line[0]}"
     1.upto(1023).each do |n|
       thiskey= "%08b" % n
 
       $key = thiskey.split("")
 
       $plain = line[0]
-      cipher = encrypt
-      #puts "#{cipher} #{line[1].split("")[0..7]}"
+      cipher = encryptb
       if(cipher == line[1].split("")[0..7])
         brutekeys.push($key.join(""))
         break
@@ -35,6 +33,21 @@ def bruteforce
   num_hash = Hash[brutekeys.uniq.map { |num| [num, brutekeys.count(num)] }]
   most_freq = brutekeys.sort_by { |num| num_hash[num] }.last
   puts " LLave final: #{most_freq}"
+end
+
+def encryptb
+
+  keyl1 = permutaciones $key, $p10
+  keyl1 = permutaciones keyl1, $lshift1
+  keyuno = permutaciones keyl1, $p8
+  keydos = permutaciones keyl1, $lshift2
+  keydos = permutaciones keydos, $p8
+  plain1 = permutaciones $plain, $ip
+  plain2 = fk plain1, keyuno
+  plain2 = permutaciones plain2, $cambio
+  plain2 = fk plain2, keydos
+  cipher = permutaciones plain2, $ip1
+  cipher
 end
 
 def encrypt
@@ -59,7 +72,7 @@ def encrypt
   plain2 = fk plain2, keydos
   #puts "Despues del fk2: #{plain2}"
   cipher = permutaciones plain2, $ip1
-  #puts "Cipheer: #{cipher}"
+  puts "Cipheer: #{cipher}"
   cipher
 end
 
@@ -81,7 +94,7 @@ def decrypt
   cipherSw = permutaciones cipherfk, $cambio
   cipherfk2 = fk cipherSw, keyuno
   plainfinal = permutaciones cipherfk2, $ip1
-  #puts "plainfinal: #{plainfinal}"
+  puts "plainfinal: #{plainfinal}"
   plainfinal
 end
 
