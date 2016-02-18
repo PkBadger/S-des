@@ -15,31 +15,22 @@ def bruteforce
   brutekeys = Array.new
   file = File.new($plain, "r")
   $plainfile = $plain
-  while (line = file.gets)
-    line = line.split(",")
-    1.upto(1023).each do |n|
-      thiskey= "%010b" % n
-
-      $key = thiskey.split("")
-
-      $plain = line[0]
-      cipher = encryptb
-      if(cipher == line[1].split("")[0..7])
-        #brutekeys.push($key.join(""))
-        count = counting
-        if(count == 245)
-          puts "llave final #{$key.join()}"
-          return
-        end
+  line = file.gets
+  line = line.split(",")
+  1.upto(1023).each do |n|
+    thiskey= "%010b" % n
+    $key = thiskey.split("")
+    $plain = line[0]
+    cipher = encryptb
+    if(cipher == line[1].split("")[0..7])
+      #brutekeys.push($key.join(""))
+      count = counting
+      if(count == 245)
+        puts "llave final #{$key.join()}"
+        return
       end
     end
   end
-  file.close
-
-  #puts brutekeys
-  num_hash = Hash[brutekeys.uniq.map { |num| [num, brutekeys.count(num)] }]
-  most_freq = brutekeys.sort_by { |num| num_hash[num] }.last
-  puts " LLave final: #{most_freq}"
 end
 
 def counting
@@ -51,13 +42,14 @@ def counting
     cipher = encryptb
     if(cipher == line[1].split("")[0..7])
       counter += 1
+    else
+      return counter
     end
   end
   counter
 end
 
 def encryptb
-
   keyl1 = permutaciones $key, $p10
   keyl1 = permutaciones keyl1, $lshift1
   keyuno = permutaciones keyl1, $p8
@@ -74,24 +66,24 @@ end
 def encrypt
   #key
   keyl1 = permutaciones $key, $p10
-  #print "#{keyl1}\n"
+  print "P10: #{keyl1.join()}\n"
   keyl1 = permutaciones keyl1, $lshift1
-  #print "#{keyl1}\n"
+  print "Left shift 1: #{keyl1.join()}\n"
   keyuno = permutaciones keyl1, $p8
-  #print "LLave 1:#{keyuno}\n"
+  print "P8, LLave 1:#{keyuno.join()}\n"
   keydos = permutaciones keyl1, $lshift2
-  #print "#{keydos}\n"
+  print "Left shift 2: #{keydos.join()}\n"
   keydos = permutaciones keydos, $p8
-  #print "#{keydos}\n"
+  print "P8, Llave 2: #{keydos.join()}\n"
   #plain
   plain1 = permutaciones $plain, $ip
-  #print "#{plain1}\n"
+  print "IP: #{plain1.join()}\n"
   plain2 = fk plain1, keyuno
-  #puts "Antes del switch: #{plain2}"
+  puts "Fk1: #{plain2.join()}"
   plain2 = permutaciones plain2, $cambio
-  #puts "despues del switch: #{plain2}"
+  puts "Switch: #{plain2.join()}"
   plain2 = fk plain2, keydos
-  #puts "Despues del fk2: #{plain2}"
+  puts "Fk2: #{plain2.join()}"
   cipher = permutaciones plain2, $ip1
   puts "Cipheer: #{cipher.join()}"
   cipher
@@ -100,20 +92,24 @@ end
 def decrypt
   #key
   keyl1 = permutaciones $key, $p10
-  #print "#{keyl1}\n"
+  print "P10: #{keyl1.join()}\n"
   keyl1 = permutaciones keyl1, $lshift1
-  #print "#{keyl1}\n"
+  print "Left Shift 1: #{keyl1.join()}\n"
   keyuno = permutaciones keyl1, $p8
-  #print "LLave 1:#{keyuno}\n"
+  print "P8, llave 1: #{keyuno.join()}\n"
   keydos = permutaciones keyl1, $lshift2
-  #print "#{keydos}\n"
+  print "Left Shift 2: #{keydos.join()}\n"
   keydos = permutaciones keydos, $p8
-  #print "#{keydos}\n"
+  print "P8, Llave 2: #{keydos.join()}\n"
   #cipher
   cipherip = permutaciones $plain, $ip
+  puts "ip : #{cipherip.join()}"
   cipherfk = fk cipherip, keydos
+  #puts "FK 1: #{cipherfk.join()}"
   cipherSw = permutaciones cipherfk, $cambio
+  puts "Switch: #{cipherSw.join()}"
   cipherfk2 = fk cipherSw, keyuno
+  #puts "FK2: #{cipherfk2.join()}"
   plainfinal = permutaciones cipherfk2, $ip1
   puts "plainfinal: #{plainfinal.join()}"
   plainfinal
